@@ -134,6 +134,8 @@
         /* Given a map of squares -> candiates, using depth-first search, 
         recursively try all possible values until a solution is found, or false
         if no solution exists. 
+        
+        TODO: Implement recusion limit for unsolvable tests
         */
         
         // Return if error in previous iteration
