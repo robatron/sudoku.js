@@ -64,6 +64,79 @@
                                     SQUARE_UNITS_MAP);
     }
 
+    // Generate
+    // -------------------------------------------------------------------------
+    sudoku.generate = function(nr_givens, unique){
+        /* Generate a new Sudoku puzzle with `nr_givens` number of given 
+        squares. By default, the puzzles are unique, uless you set `unique` to
+        false.
+        
+        (Note: Puzzle uniqueness is not yet implemented.)
+        */
+        
+        // Force nr_givens between 0 and 81 inclusive
+        nr_givens = nr_givens < 0 ? 0 : (nr_givens > 81 ? 81: nr_givens);
+        
+        // Default unique to true
+        // TODO: Implement uniqueness!
+        unique = unique || true;
+        
+        // Get a set of squares and all possible candidates for each square
+        var blank_board = "";
+        for(var i = 0; i < 81; ++i){
+            blank_board += '.';
+        }
+        var candidates = sudoku.get_candidates(blank_board);
+        
+        // For each item in a shuffled list of squares
+        var shuffled_squares = sudoku._shuffle(SQUARES);
+        for(var si in shuffled_squares){
+            var square = shuffled_squares[si];
+            
+            // If an assignment of a random chioce causes a contradictoin, give
+            // up and try again
+            var rand_candidate_idx = 
+                    sudoku._rand_range(candidates[square].length);
+            var rand_candidate = candidates[square][rand_candidate_idx];
+            if(!sudoku._assign(candidates, square, rand_candidate)){
+                break;
+            }
+            
+            // Make a list of all single candidates
+            var single_candidates = [];
+            for(var si in SQUARES){
+                var square = SQUARES[si];
+                
+                if(candidates[square].length == 1){
+                    single_candidates.push(candidates[square]);
+                }
+            }
+            
+            /*
+            # If we have at least N values, and
+                if len(ds) >= N and len(set(ds)) >= 8:
+                    return ''.join(values[s] if len(values[s])==1 else '.' for s in squares)
+            */
+            // If we have at least nr_givens, and the unique candidate count is
+            // at least 8, return the puzzle!
+            if(single_candidates.length >= nr_givens && 
+                    sudoku._strip_dups(single_candidates).length >= 8){
+                var board = "";
+                for(var si in SQUARES){
+                    var square = SQUARES[si];
+                    if(candidates[square].length == 1){
+                        board += candidates[square];
+                    } else {
+                        board += BLANK_CHAR;
+                    }
+                }
+                return board;
+            }
+        }
+        
+        // Give up and try a new puzzle
+        return sudoku.generate(nr_givens);
+    }
 
     // Solve
     // -------------------------------------------------------------------------
@@ -478,6 +551,57 @@
         return false;
     }
 
+    sudoku._shuffle = function(seq){
+        /* Return a shuffled version of `seq`
+        */
+        
+        // Create an array of the same size as `seq` filled with false
+        var shuffled = [];
+        for(var i = 0; i < seq.length; ++i){
+            shuffled.push(false);
+        }
+        
+        for(var i in seq){
+            var ti = sudoku._rand_range(seq.length);
+            
+            while(shuffled[ti]){
+                ti = (ti + 1) > (seq.length - 1) ? 0 : (ti + 1);
+            }
+            
+            shuffled[ti] = seq[i];
+        }
+        
+        return shuffled;
+    };
+
+    sudoku._rand_range = function(max, min){
+        /* Get a random integer in the range of `min` to `max` (non inclusive).
+        If `min` not defined, default to 0. If `max` not defined, throw an 
+        error.
+        */
+        min = min || 0;
+        if(max){
+            return Math.floor(Math.random() * (max - min)) + min;
+        } else {
+            throw "Range undefined";
+            return false;
+        }
+    };
+
+    sudoku._strip_dups = function(seq){
+        /* Strip duplicate values from `seq`
+        */
+        var seq_set = [];
+        var dup_map = {};
+        for(var i in seq){
+            var e = seq[i];
+            if(!dup_map[e]){
+                seq_set.push(e);
+                dup_map[e] = true;
+            }
+        }
+        return seq_set;
+    };
 
     // Initialize library after load
     initialize();
