@@ -27,40 +27,39 @@
     [3]: http://en.wikipedia.org/wiki/Sudoku
 */
 
-(function(win){
-    
-    // Create global reference to this entire library
-    var sudoku = win.sudoku = {};
+(function(root){
+    var sudoku = root.sudoku = {};  // Global reference to the sudoku library
 
-
-    // Lib globals
     var DIGITS = "123456789";       // Allowed digits
     var ROWS = "ABCDEFGHI";         // Row lables
     var COLS = DIGITS;              // Column lables
     var SQUARES = null;             // Square IDs
 
     var UNITS = null;               // All units (row, column, or box)
-    var SQUARE_UNITS_MAP = null;     // Squares -> units map
+    var SQUARE_UNITS_MAP = null;    // Squares -> units map
     var SQUARE_PEERS_MAP = null;    // Squares -> peers map
 
     var BLANK_CHAR = '.';           // How to represent a blank square
 
-
+    // Init
+    // -------------------------------------------------------------------------
     function initialize(){
         /* Initialize the Sudoku library (invoked after library load)
         */
         SQUARES             = sudoku._cross(ROWS, COLS);
         UNITS               = sudoku._get_all_units(ROWS, COLS);
         SQUARE_UNITS_MAP    = sudoku._get_square_units_map(SQUARES, UNITS);
-        SQUARE_PEERS_MAP    = sudoku._get_square_peers_map(SQUARES, SQUARE_UNITS_MAP);
+        SQUARE_PEERS_MAP    = sudoku._get_square_peers_map(SQUARES, 
+                                    SQUARE_UNITS_MAP);
     }
 
+
     // Solve
-    // -----
-    
+    // -------------------------------------------------------------------------
     sudoku.solve = function(board){
-        /* Solve a sudoku puzzle given a sudoku `board`, i.e., a representation
-        of the board with digits, 1-9, and spaces identified by '.'
+        /* Solve a sudoku puzzle given a sudoku `board`, i.e., an 81-character 
+        string of digits, 1-9, and spaces identified by '.', representing the
+        squares.
         */
         var result = sudoku._search(sudoku.get_candidates(board));
         var solution = "";
@@ -70,191 +69,9 @@
         return solution;
     };
 
-    sudoku._search = function(candidates){
-        /* Given a map of squares -> candiates, using depth-first search and
-        constraint propigation, recursively try all possible values until a 
-        solution is found, or false if no solution exists. 
-        */
-        
-        // Return if error in previous iteration
-        if(!candidates){
-            //console.log("Search: Error encountered in previous iteration. Returning false.")
-            return false;
-        }
-        
-        //console.log("Search: Searching", JSON.stringify(candidates));
-        
-        // If only one candidate for every square, we've a solved puzzle!
-        // Return the candidates map.
-        var max_nr_candidates = 0;
-        var max_candidates_square = null;
-        for(var si in SQUARES){
-            var square = SQUARES[si];
-            
-            var nr_candidates = candidates[square].length;
-                
-            if(nr_candidates > max_nr_candidates){
-                max_nr_candidates = nr_candidates;
-                max_candidates_square = square;
-            }
-        }
-        //console.log("Search: Most candidates: ", max_candidates_square, candidates[max_candidates_square], " (", max_nr_candidates")");
-        if(max_nr_candidates === 1){
-            return candidates;
-        }
-        
-        // Choose the blank square with the fewest possibilities > 1
-        var min_nr_candidates = 10;
-        var min_candidates_square = null;
-        for(si in SQUARES){
-            square = SQUARES[si];
-            
-            nr_candidates = candidates[square].length;
-            
-            if(nr_candidates < min_nr_candidates && nr_candidates > 1){
-                min_nr_candidates = nr_candidates;
-                min_candidates_square = square;
-            }
-        }
-        //console.log("Search: Fewest candidates: ", min_candidates_square, ":",candidates[min_candidates_square], " (", min_nr_candidates, ")");
-        
-        // Recursively search for each of the candidates of the square with the
-        // fewest candidates. Return false if
-        var candidates_next = [];
-        for(var vi in candidates[min_candidates_square]){
-            var val = candidates[min_candidates_square][vi];
-            
-            var candidates_copy = JSON.parse(JSON.stringify(candidates));
-                    
-            candidates_next.push(
-                sudoku._search(
-                    sudoku._assign(candidates_copy, min_candidates_square, val)
-                )
-            );
-        }
-        //console.log(candidates_next, sudoku._first_true(candidates_next));
-        return sudoku._first_true(candidates_next);
-    };
-
-    sudoku._assign = function(candidates, square, val){
-        /* Eliminate all values, *except* for `val`, from `candidates` at 
-        `square` (candidates[square]), and propagate. Return the candidates map
-        when finished. If a contradiciton is found, return false.
-        */
-
-        //console.log("\tAssign: Assigning val", val, "to square", square);
-
-        // Grab a list of canidates without 'val'
-        var other_vals = candidates[square].replace(val, "");
-
-        // Loop through all other values and eliminate them from the candidates 
-        // at the current square, and propigate. If at any point we get a 
-        // contradiction, return false.
-        for(var ovi in other_vals){
-            var other_val = other_vals[ovi];
-
-            var candidates_next =
-                sudoku._eliminate(candidates, square, other_val);
-
-            if(!candidates_next){
-                //console.log("Contradiction found by _eliminate.");
-                return false;
-            }
-        }
-
-        return candidates;
-    };
-
-    sudoku._eliminate = function(candidates, square, val){
-        /* Eliminate `val` from `candidates` at `square`, (candidates[square]),
-        and propagate when values or places <= 2. Return updated candidates,
-        unless a contradiction is detected, in which case, return false.
-        */
-
-        // If `val` has already been eliminated from candidates[square], return
-        // with candidates.
-        if(!sudoku._in(val, candidates[square])){
-            return candidates;
-        }
-
-        //console.log("\t\tEliminate: Eliminating val", val, "from square", square);
-
-        // Remove `val` from candidates[square]
-        candidates[square] = candidates[square].replace(val, '');
-           
-        // If the square has only candidate left, eliminate that value from its 
-        // peers
-        var nr_candidates = candidates[square].length;
-        if(nr_candidates === 1){
-            var target_val = candidates[square];
-            
-            for(var pi in SQUARE_PEERS_MAP[square]){
-                var peer = SQUARE_PEERS_MAP[square][pi];
-                
-                var candidates_new = 
-                        sudoku._eliminate(candidates, peer, target_val);
-                        
-                if(!candidates_new){
-                    //console.log("Contradiction found by _eliminate.");
-                    return false;
-                }
-            }
-        
-        // Otherwise, if the square has no candidates, we have a contradiction.
-        // Return false.
-        } if(nr_candidates === 0){
-            //console.log("Contradiction: Current square," + square + ", has no candidates.");
-            return false;
-        }
-        
-        // If a unit is reduced to only one place for a value, then assign it
-        for(var ui in SQUARE_UNITS_MAP[square]){
-            var unit = SQUARE_UNITS_MAP[square][ui];
-            
-            var val_places = [];
-            for(var si in unit){
-                var unit_square = unit[si];
-                if(sudoku._in(val, candidates[unit_square])){
-                    val_places.push(unit_square);
-                }
-            }
-            
-            // If there's no place for this value, we have a contradition!
-            // return false
-            if(val_places.length == 0){
-                //console.log("Contradiction: There are no places for val, " + val + ", in unit, " + unit)
-                return false;
-                
-            // Otherwise the value can only be in one place. Assign it there.
-            } else if(val_places.length == 1){
-                var candidates_new = 
-                    sudoku._assign(candidates, val_places[0], val);
-                
-                if(!candidates_new){
-                    //console.log("Contradiction found by _assign")
-                    return false
-                }
-            }
-        }
-        
-        return candidates;
-    };
-
-    
-    // Square relationships
-    // --------------------
-    // Squares, and their relationships with:
-    //      
-    //      - Candidates    = Possible values for each square
-    //      - Units         = A square's units, e.g., row, column, and box
-    //      - Peers         = A set of peer squares in a square's units
-    
     sudoku.get_candidates = function(board){
         /* Get all possible candidates for each square as a map in the form
-        {square: digits}. 
-        
-        `board` is a representation of the board with digits, 
-        1-9, and spaces identified by '.'. 
+        {square: digits}.
         
         @throws errors if board is not 81 digits, or if those digits aren't 1-9 
             or '.'
@@ -281,16 +98,12 @@
             candidate_map[SQUARES[si]] = DIGITS;
         }
         
-        //console.log("Get candidates: Finding candidates for board ", board, ", current candidates map: ", candidate_map);
-        
         // For each non-blank square, assign its value in the candidate map and
         // propigate.
         for(var square in squares_values_map){
             val = squares_values_map[square];
             
             if(sudoku._in(val, DIGITS)){
-                //console.log("Get candidates: Working on square ", square, ", value ", val);
-                
                 var new_candidates = sudoku._assign(candidate_map, square, val)
                 
                 // Fail if we can't assign val to square
@@ -302,10 +115,174 @@
         
         return candidate_map;
     }
+
+    sudoku._search = function(candidates){
+        /* Given a map of squares -> candiates, using depth-first search, 
+        recursively try all possible values until a solution is found, or false
+        if no solution exists. 
+        */
+        
+        // Return if error in previous iteration
+        if(!candidates){
+            return false;
+        }
+        
+        // If only one candidate for every square, we've a solved puzzle!
+        // Return the candidates map.
+        var max_nr_candidates = 0;
+        var max_candidates_square = null;
+        for(var si in SQUARES){
+            var square = SQUARES[si];
+            
+            var nr_candidates = candidates[square].length;
+                
+            if(nr_candidates > max_nr_candidates){
+                max_nr_candidates = nr_candidates;
+                max_candidates_square = square;
+            }
+        }
+        if(max_nr_candidates === 1){
+            return candidates;
+        }
+        
+        // Choose the blank square with the fewest possibilities > 1
+        var min_nr_candidates = 10;
+        var min_candidates_square = null;
+        for(si in SQUARES){
+            square = SQUARES[si];
+            
+            nr_candidates = candidates[square].length;
+            
+            if(nr_candidates < min_nr_candidates && nr_candidates > 1){
+                min_nr_candidates = nr_candidates;
+                min_candidates_square = square;
+            }
+        }
+        
+        // Recursively search for each of the candidates of the square with the
+        // fewest candidates. Return false if
+        var candidates_next = [];
+        for(var vi in candidates[min_candidates_square]){
+            var val = candidates[min_candidates_square][vi];
+            
+            var candidates_copy = JSON.parse(JSON.stringify(candidates));
+                    
+            candidates_next.push(
+                sudoku._search(
+                    sudoku._assign(candidates_copy, min_candidates_square, val)
+                )
+            );
+        }
+        return sudoku._first_true(candidates_next);
+    };
+
+    sudoku._assign = function(candidates, square, val){
+        /* Eliminate all values, *except* for `val`, from `candidates` at 
+        `square` (candidates[square]), and propagate. Return the candidates map
+        when finished. If a contradiciton is found, return false.
+        
+        WARNING: This will modify the contents of `candidates` directly.
+        */
+
+        // Grab a list of canidates without 'val'
+        var other_vals = candidates[square].replace(val, "");
+
+        // Loop through all other values and eliminate them from the candidates 
+        // at the current square, and propigate. If at any point we get a 
+        // contradiction, return false.
+        for(var ovi in other_vals){
+            var other_val = other_vals[ovi];
+
+            var candidates_next =
+                sudoku._eliminate(candidates, square, other_val);
+
+            if(!candidates_next){
+                //console.log("Contradiction found by _eliminate.");
+                return false;
+            }
+        }
+
+        return candidates;
+    };
+
+    sudoku._eliminate = function(candidates, square, val){
+        /* Eliminate `val` from `candidates` at `square`, (candidates[square]),
+        and propagate when values or places <= 2. Return updated candidates,
+        unless a contradiction is detected, in which case, return false.
+        
+        WARNING: This will modify the contents of `candidates` directly.
+        */
+
+        // If `val` has already been eliminated from candidates[square], return
+        // with candidates.
+        if(!sudoku._in(val, candidates[square])){
+            return candidates;
+        }
+
+        // Remove `val` from candidates[square]
+        candidates[square] = candidates[square].replace(val, '');
+           
+        // If the square has only candidate left, eliminate that value from its 
+        // peers
+        var nr_candidates = candidates[square].length;
+        if(nr_candidates === 1){
+            var target_val = candidates[square];
+            
+            for(var pi in SQUARE_PEERS_MAP[square]){
+                var peer = SQUARE_PEERS_MAP[square][pi];
+                
+                var candidates_new = 
+                        sudoku._eliminate(candidates, peer, target_val);
+                        
+                if(!candidates_new){
+                    return false;
+                }
+            }
+        
+        // Otherwise, if the square has no candidates, we have a contradiction.
+        // Return false.
+        } if(nr_candidates === 0){
+            return false;
+        }
+        
+        // If a unit is reduced to only one place for a value, then assign it
+        for(var ui in SQUARE_UNITS_MAP[square]){
+            var unit = SQUARE_UNITS_MAP[square][ui];
+            
+            var val_places = [];
+            for(var si in unit){
+                var unit_square = unit[si];
+                if(sudoku._in(val, candidates[unit_square])){
+                    val_places.push(unit_square);
+                }
+            }
+            
+            // If there's no place for this value, we have a contradition!
+            // return false
+            if(val_places.length === 0){
+                return false;
+                
+            // Otherwise the value can only be in one place. Assign it there.
+            } else if(val_places.length === 1){
+                candidates_new = 
+                    sudoku._assign(candidates, val_places[0], val);
+                
+                if(!candidates_new){
+                    return false;
+                }
+            }
+        }
+        
+        return candidates;
+    };
+
+    
+    // Square relationships
+    // -------------------------------------------------------------------------
+    // Squares, and their relationships with values, units, and peers.
     
     sudoku._get_square_vals_map = function(board){
-        /* Return a map of squares -> values with blanks (non-1-9 chars) 
-        represented as '.'.
+        /* Return a map of squares -> values
         */
         var squares_vals_map = {};
         
@@ -415,7 +392,7 @@
     
 
     // Utility
-    // -------
+    // -------------------------------------------------------------------------
 
     sudoku._cross = function(a, b){
         /* Cross product of all elements in `a` and `b`, e.g.,
@@ -475,4 +452,4 @@
     // Initialize library after load
     initialize();
     
-})(window);
+})(this);
