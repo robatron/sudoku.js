@@ -18,13 +18,24 @@
         >>> sudoku.generate()
         >>> sudoku.get_candidates()
 
+    Vocab:
+    
+        Square:
+        Unit:
+        Box:
+        
+
     References:
         - Michael Anderson's Python implementation for Mac OS X[2]
-        - "Sudoku" on Wikipedia[2]
+        - "Sudoku" on Wikipedia[3]
+        - 95 Sudoku Puzzles[4]
+        - Andrew Stuart's online Sudoku Solver[5]
         
     [1]: http://norvig.com/sudoku.html
     [2]: https://github.com/andermic/cousins/tree/master/sudoku
     [3]: http://en.wikipedia.org/wiki/Sudoku
+    [4]: http://magictour.free.fr/top95
+    [5]: http://www.sudokuwiki.org/sudoku.htm
 */
 
 (function(root){
@@ -62,16 +73,19 @@
         squares.
         */
         var result = sudoku._search(sudoku.get_candidates(board));
-        var solution = "";
-        for(var square in result){
-            solution += result[square];
+        if(result){
+            var solution = "";
+            for(var square in result){
+                solution += result[square];
+            }
+            return solution;
         }
-        return solution;
+        return false;
     };
 
     sudoku.get_candidates = function(board){
         /* Get all possible candidates for each square as a map in the form
-        {square: digits}.
+        {square: digits} using recursive constraint propagation.
         
         @throws errors if board is not 81 digits, or if those digits aren't 1-9 
             or '.'
@@ -394,6 +408,42 @@
     // Utility
     // -------------------------------------------------------------------------
 
+    sudoku.display_board = function(board){
+        /* Display a sudoku `board` to the console.
+        */
+        var V_PADDING = " "; // Insert after each square
+        var H_PADDING = '\n' // Insert after each row
+        
+        var V_BOX_PADDING = "  "; // Box vertical padding
+        var H_BOX_PADDING = '\n'; // Box horizontal padding
+
+        var display_string = "";
+        
+        for(var i in board){
+            var square = board[i];
+            
+            // Add the square and some padding
+            display_string += square + V_PADDING;
+            
+            // Vertical edge of a box, insert v. box padding
+            if(i % 3 === 2){
+                display_string += V_BOX_PADDING;
+            }
+            
+            // End of a line, insert horiz. padding
+            if(i % 9 === 8){
+                display_string += H_PADDING;
+            }
+            
+            // Horizontal edge of a box, insert h. box padding
+            if(i % 27 === 26){
+                display_string += H_BOX_PADDING;
+            }
+        }
+
+        console.log(display_string);
+    };
+
     sudoku._cross = function(a, b){
         /* Cross product of all elements in `a` and `b`, e.g.,
         sudoku._cross("abc", "123") ->
@@ -425,28 +475,6 @@
         }
         return false;
     }
-    
-    sudoku.display_board = function(board){
-        /* Display a sudoku `board` to the console.
-        */
-
-        var HORIZ_SEPARATOR = '\n';
-        var VERT_SEPARATOR  = "  ";
-        var PADDING         = " ";
-
-        var display_string = "";
-        
-        for(var r = 0; r < 9; ++r){
-            for(var c = 0; c < 9; ++c){
-                display_string += board[r][c] + PADDING;
-                if(c % 3 === 2) display_string += VERT_SEPARATOR;
-                if(c % 9 === 8) display_string += "\n";
-            }
-            if(r % 3 === 2) display_string += HORIZ_SEPARATOR;
-        }
-
-        //console.log(display_string);
-    };
 
 
     // Initialize library after load
