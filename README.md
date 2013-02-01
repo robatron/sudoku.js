@@ -8,8 +8,7 @@ A Sudoku puzzle generator and solver JavaScript library based on
 Puzzles are represented by a string of digits, 1-9, and '.' as spaces. Each
 character represents a square, e.g., 
 
-    "52...6.........7.13...........4..8..6......5...........418.........3."+
-    ".2...87....."
+    "52...6.........7.13...........4..8..6......5...........418.........3..2...87....."
     
 Represents the following board:
 
@@ -33,15 +32,13 @@ Generate a board:
 
     >>> var board = sudoku.generate(17)
     
-    "...9...2........6......6.........6....5.4.......7...8....4.2378..8.
-    ......47.....6"
+    "...9...2........6......6.........6....5.4.......7...8....4.2378..8.......47.....6"
 
 Solve a board:
 
     >>> sudoku.solve(board)
     
-    "1369548272541789637892361454723856198156497326937215845614923783285
-    67491947813256"
+    "136954827254178963789236145472385619815649732693721584561492378328567491947813256"
 
 Get all candidates for every square:
 
