@@ -1,8 +1,10 @@
 Sudoku.js
 ==========
 
-A Sudoku puzzle generator and solver JavaScript library based on 
-["Solving Every Sudoku Puzzle"][1] by Peter Norvig.
+A Sudoku puzzle **generator** and **solver* JavaScript library.
+
+Based on ["Solving Every Sudoku Puzzle"][1] by Peter Norvig, and 
+Michael Anderson's [generator/solver][2].
 
 
 Puzzles are represented by a string of digits, 1-9, and '.' as spaces. Each
