@@ -136,7 +136,6 @@
             throw "Too few givens. Minimum givens is " + MIN_GIVENS;
         }
 
-loops = 0;
         var candidates = sudoku.get_candidates(board);
         var result = sudoku._search(candidates);
         
@@ -192,23 +191,16 @@ loops = 0;
         return candidate_map;
     };
 
-var loops = 0;
-
     sudoku._search = function(candidates){
         /* Given a map of squares -> candiates, using depth-first search, 
         recursively try all possible values until a solution is found, or false
         if no solution exists. 
-        
-        TODO: Implement recusion limit for unsolvable tests
         */
         
         // Return if error in previous iteration
         if(!candidates){
             return false;
         }
-        
-        loops++;
-        console.log(loops);
         
         // If only one candidate for every square, we've a solved puzzle!
         // Return the candidates map.
