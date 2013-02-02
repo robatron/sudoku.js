@@ -1,11 +1,14 @@
 Sudoku.js
 ==========
 
-A Sudoku puzzle **generator** and **solver* JavaScript library.
+A Sudoku puzzle **generator** and **solver** JavaScript library.
 
 Based on ["Solving Every Sudoku Puzzle"][1] by Peter Norvig, and 
 Michael Anderson's [generator/solver][2].
 
+
+Intro
+-----
 
 Puzzles are represented by a string of digits, 1-9, and '.' as spaces. Each
 character represents a square, e.g., 
@@ -14,35 +17,78 @@ character represents a square, e.g.,
     
 Represents the following board:
 
-    5 2 .   . . 6   . . .   
-    . . .   . . .   7 . 1   
-    3 . .   . . .   . . .   
+    5 2 . | . . 6 | . . .   
+    . . . | . . . | 7 . 1   
+    3 . . | . . . | . . .   
+    ------+-------+------
+    . . . | 4 . . | 8 . .   
+    6 . . | . . . | . 5 .   
+    . . . | . . . | . . .   
+    ------+-------+------
+    . 4 1 | 8 . . | . . .   
+    . . . | . 3 . | . 2 .   
+    . . 8 | 7 . . | . . .
+
+
+Generate a Sudoku puzzle
+------------------------
+
+Generage a Sudoku puzzle of a particular difficulty, e.g,
+
+    >>> sudoku.generate("easy")
+    "672819345193..4862485..3197824137659761945283359...714.38..1426.174.6.38.463...71"
     
-    . . .   4 . .   8 . .   
-    6 . .   . . .   . 5 .   
-    . . .   . . .   . . .   
+    >>> sudoku.generate("medium")
+    "8.4.71.9.976.3....5.196....3.7495...692183...4.5726..92483591..169847...753612984"
     
-    . 4 1   8 . .   . . .   
-    . . .   . 3 .   . 2 .   
-    . . 8   7 . .   . . .
+    >>> sudoku.generate("hard")
+    ".17..69..356194.2..89..71.6.65...273872563419.43...685521......798..53..634...59."
 
 
-Usage:
-------
+Valid difficulties are as follows, and represent the number of given squares:
 
-**Generate** a board:
-
-    >>> var board = sudoku.generate(17)
+    "easy":         61
+    "medium":       52
+    "hard":         43
+    "very-hard":    34
+    "insane":       25
+    "inhuman":      17
     
-    "...9...2........6......6.........6....5.4.......7...8....4.2378..8.......47.....6"
-
-**Solve** a board:
-
-    >>> sudoku.solve(board)
     
-    "136954827254178963789236145472385619815649732693721584561492378328567491947813256"
+You may also enter a custom number of squares to give, e.g.,
 
-Get all candidates for every square:
+    >>> sudoku.generate(60)
+    "8941376521532687497269548...72.9158.538.4219..19.852..3874.69.52415793689658.34.."
+
+
+The number of givens must be a number between 17 and 81 inclusive. If it's 
+outside of that range, the number of givens will be set to the closest bound, 
+e.g., 0 will be treated as 17, and 100 as81.
+
+
+By default, the puzzles should have unique solutions, unless you set `unique` to
+false, e.g., 
+
+    sudoku.generate("easy", false)
+
+
+Note: **Puzzle uniqueness is not yet implemented**, so puzzles are *not* 
+guaranteed to have unique solutions)
+
+
+Solve a Sudoku puzzle
+---------------------
+
+Solve a Sudoku puzzle given a Sudoku puzzle represented as a string, e.g.,
+
+    >>> sudoku.solve(".17..69..356194.2..89..71.6.65...273872563419.43...685521......798..53..634...59.");
+    "217386954356194728489257136165948273872563419943712685521439867798625341634871592"
+
+
+Get candidates
+--------------
+
+Get the candidates of every square, i.e., the possible values of each square:
 
     >>> sudoku.get_candidates(board)
     
@@ -63,21 +109,22 @@ Get all candidates for every square:
     "H9":"12459","I1":"12359","I2":"4","I3":"7","I4":"1358",
     "I5":"13589","I6":"13589","I7":"1259","I8":"159","I9":"6"}
 
-Display a board to the console:
 
-    >>> sudoku.display_board(board)
+Print a board to the console
+----------------------------
+
+    >>> sudoku.print_board(".17..69..356194.2..89..71.6.65...273872563419.43...685521......798..53..634...59.");
+    . 1 7   . . 6   9 . .   
+    3 5 6   1 9 4   . 2 .   
+    . 8 9   . . 7   1 . 6   
     
-    . . .   9 . .   . 2 .   
-    . . .   . . .   . 6 .   
-    . . .   . . 6   . . .   
+    . 6 5   . . .   2 7 3   
+    8 7 2   5 6 3   4 1 9   
+    . 4 3   . . .   6 8 5   
     
-    . . .   . . .   6 . .   
-    . . 5   . 4 .   . . .   
-    . . .   7 . .   . 8 .   
-    
-    . . .   4 . 2   3 7 8   
-    . . 8   . . .   . . .   
-    . 4 7   . . .   . . 6 
+    5 2 1   . . .   . . .   
+    7 9 8   . . 5   3 . .   
+    6 3 4   . . .   5 9 .  
     
 
 References:
