@@ -517,9 +517,16 @@
     // Utility
     // -------------------------------------------------------------------------
 
-    sudoku.display_board = function(board){
+    sudoku.display = function(board){
         /* Display a sudoku `board` to the console.
         */
+        
+        // Assure a valid board
+        var report = sudoku.validate_board(board);
+        if(report !== true){
+            throw report;
+        }
+        
         var V_PADDING = " ";  // Insert after each square
         var H_PADDING = '\n'; // Insert after each row
         
@@ -579,21 +586,6 @@
         
         // Otherwise, we're good. Return true.
         return true;
-    };
-    
-    sudoku.nr_combos = function(candidates){
-        /* Return the number of possible combinations of candidates you would
-        have to try if you were brute forcing a puzzle given its `candidates`.
-        Used internally for recursion depth checking.
-        */
-        var perms = 1;
-        for(var k in candidates){
-            var nr_candidates = candidates[k].length;
-            if(nr_candidates > 1){
-                perms *= nr_candidates;
-            }
-        }
-        return perms;
     };
 
     sudoku._cross = function(a, b){
