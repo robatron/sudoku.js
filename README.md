@@ -93,7 +93,7 @@ Solve a Sudoku puzzle given a Sudoku puzzle represented as a string, e.g.,
 Board string ↔ grid
 --------------------------------------------------------------------------------
 
-Board string to a grid:
+Board string → grid:
 
 ```javascript
 >>> sudoku.board_string_to_grid("23.94.67.8..3259149..76.32.1.....7925.321.4864..68.5317..1....96598721433...9...7")
@@ -110,7 +110,7 @@ Board string to a grid:
 ]
 ```
 
-Board grid to a string:
+Board grid → string:
 
 ```javascript
 >>> sudoku.board_grid_to_string([
