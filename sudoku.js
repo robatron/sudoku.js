@@ -31,7 +31,7 @@
     
     // Define difficulties by how many squares are given to the player in a new
     // puzzle.
-    sudoku.DIFFICULTY = {
+    var DIFFICULTY = {
         "easy":         61,
         "medium":       52,
         "hard":         43,
@@ -54,31 +54,32 @@
 
     // Generate
     // -------------------------------------------------------------------------
-    sudoku.generate = function(nr_givens, unique){
-        /* Generate a new Sudoku puzzle with `nr_givens` number of given 
-        squares, e.g.,
+    sudoku.generate = function(difficulty, unique){
+        /* Generate a new Sudoku puzzle of a particular `difficulty`, e.g.,
+        
+            // Generate an "easy" sudoku puzzle
+            sudoku.generate("easy");
+            
+        
+        Difficulties are as follows, and represent the number of given squares:
+        
+                "easy":         61
+                "medium":       52
+                "hard":         43
+                "very-hard":    34
+                "insane":       25
+                "inhuman":      17
+            
+            
+        You may also enter a custom number of squares to be given, e.g.,
         
             // Generate a new Sudoku puzzle with 60 given squares
             sudoku.generate(60)
     
-        `nr_givens` must be a number between 17 and 81 inclusive. If it's
-        outside of that range, `nr_givens` will be set to the closest bound.
-        
-        
-        You can also use preset difficulties with `sudoku.DIFFICULTY`:
-        
-            sudoku.DIFFICULTY = {
-                "easy":         61,
-                "medium":       52,
-                "hard":         43,
-                "very-hard":    34,
-                "insane":       25,
-                "inhuman":      17,
-            };
-            
-        e.g., 
-        
-            sudoku.generate(sudoku.DIFFICULTY["easy"]);
+    
+        `difficulty` must be a number between 17 and 81 inclusive. If it's
+        outside of that range, `difficulty` will be set to the closest bound,
+        e.g., 0 -> 17, and 100 -> 81.
         
         
         By default, the puzzles are unique, uless you set `unique` to false. 
@@ -88,8 +89,15 @@
         TODO: Implement puzzle uniqueness
         */
         
-        // Force nr_givens between 17 and 81 inclusive
-        nr_givens = sudoku._force_range(nr_givens, NR_SQUARES + 1, MIN_GIVENS);
+        // If `difficulty` is a string or undefined, convert it to a number or
+        // default it to "easy" if undefined.
+        if(typeof difficulty === "string" || typeof difficulty === "undefined"){
+            difficulty = DIFFICULTY[difficulty] || DIFFICULTY.easy;
+        }
+        
+        // Force difficulty between 17 and 81 inclusive
+        difficulty = sudoku._force_range(difficulty, NR_SQUARES + 1, 
+                MIN_GIVENS);
         
         // Default unique to true
         unique = unique || true;
@@ -125,9 +133,9 @@
                 }
             }
             
-            // If we have at least nr_givens, and the unique candidate count is
+            // If we have at least difficulty, and the unique candidate count is
             // at least 8, return the puzzle!
-            if(single_candidates.length >= nr_givens && 
+            if(single_candidates.length >= difficulty && 
                     sudoku._strip_dups(single_candidates).length >= 8){
                 var board = "";
                 for(var si in SQUARES){
@@ -143,7 +151,7 @@
         }
         
         // Give up and try a new puzzle
-        return sudoku.generate(nr_givens);
+        return sudoku.generate(difficulty);
     };
 
     // Solve
