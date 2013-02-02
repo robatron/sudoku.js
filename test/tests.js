@@ -27,6 +27,8 @@ test("Solve", function(){
     var puz_unsolvable = 
         ".........9......84.623...5....6...453...1...6...9...7....1.....4.5..2"+
         "....3.8...99";
+    var puz_unsolvable2 = "5168497323.46.2...5.97...65135.6.9.7472591..696837."+
+        ".5.253186.746842.75..791.5.6.8";
     var puz_too_big = 
         ".........9......84.623...5....6...453...1...6...9...7....1.....4.5..2"+
         "....3.8....91";
@@ -39,8 +41,9 @@ test("Solve", function(){
     ok(sudoku.solve(puz2[0]) === puz2[1], puz2[0] + " -> " + puz2[1]);
     ok(sudoku.solve(puz3[0]) === puz3[1], puz3[0] + " -> " + puz3[1]);
     
-    // Try to solve an unsolvable puzzle
+    // Try to solve unsolvable puzzles
     ok(!sudoku.solve(puz_unsolvable), "Unsolvable");
+    ok(!sudoku.solve(puz_unsolvable2), "Unsolvable 2");
     
     // Board too big
     throws(function(){sudoku.solve(puz_too_big)}, "Invalid board size");

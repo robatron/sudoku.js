@@ -51,8 +51,10 @@
         (Note: Puzzle uniqueness is not yet implemented.)
         */
         
-        // Force nr_givens between 17 and 81 inclusive
-        nr_givens = sudoku._force_range(nr_givens, NR_SQUARES + 1, MIN_GIVENS);
+        // Make sure nr_givens is at least the minimum allowed givens
+        if(nr_givens < MIN_GIVENS){
+            throw "Too few givens";
+        }
         
         // Default unique to true
         // TODO: Implement uniqueness!
@@ -234,11 +236,12 @@
             }
         }
         
-        // Recursively search for each of the candidates of the square with the
-        // fewest candidates.
+        // Recursively search through each of the candidates of the square 
+        // starting with the one with fewest candidates.
         for(var vi in candidates[min_candidates_square]){
             var val = candidates[min_candidates_square][vi];
             
+            // TODO: Implement a non-rediculous deep copy function
             var candidates_copy = JSON.parse(JSON.stringify(candidates));
             var candidates_next = sudoku._search(
                 sudoku._assign(candidates_copy, min_candidates_square, val)
@@ -248,6 +251,10 @@
                 return candidates_next;
             }
         }
+        
+        // If we get through all combinations of the square with the fewest
+        // candidates without finding an answer, there isn't one. Return false.
+        return false;
     };
 
     sudoku._assign = function(candidates, square, val){
