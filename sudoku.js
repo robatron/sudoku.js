@@ -32,11 +32,11 @@
     // Define difficulties by how many squares are given to the player in a new
     // puzzle.
     var DIFFICULTY = {
-        "easy":         61,
-        "medium":       52,
-        "hard":         43,
-        "very-hard":    34,
-        "insane":       25,
+        "easy":         62,
+        "medium":       53,
+        "hard":         44,
+        "very-hard":    35,
+        "insane":       26,
         "inhuman":      17,
     };
 
@@ -87,6 +87,7 @@
         guaranteed to have unique solutions)
         
         TODO: Implement puzzle uniqueness
+        TODO: Enforce exact difficulty number, e.g., 17 = 17, not ~17
         */
         
         // If `difficulty` is a string or undefined, convert it to a number or
@@ -511,6 +512,36 @@
         }
 
         return units;
+    };
+    
+
+    // Conversions
+    // -------------------------------------------------------------------------
+    sudoku.board_string_to_grid = function(board_string){
+        /* Convert a board string to a two-dimensional array
+        */
+        var rows = [];
+        var cur_row = [];
+        for(var i in board_string){
+            cur_row.push(board_string[i]);
+            if(i % 9 == 8){
+                rows.push(cur_row);
+                cur_row = [];
+            }
+        }
+        return rows;
+    };
+    
+    sudoku.board_grid_to_string = function(board_grid){
+        /* Convert a board grid to a string
+        */
+        var board_string = "";
+        for(var r = 0; r < 9; ++r){
+            for(var c = 0; c < 9; ++c){
+                board_string += board_grid[r][c];
+            }   
+        }
+        return board_string;
     };
     
 
