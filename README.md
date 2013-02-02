@@ -90,7 +90,7 @@ Solve a Sudoku puzzle given a Sudoku puzzle represented as a string, e.g.,
 ```
 
 
-Conversions
+Board string ↔ grid
 --------------------------------------------------------------------------------
 
 Board string to a grid:
