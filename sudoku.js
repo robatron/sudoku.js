@@ -517,8 +517,8 @@
     // Utility
     // -------------------------------------------------------------------------
 
-    sudoku.display = function(board){
-        /* Display a sudoku `board` to the console.
+    sudoku.print_board = function(board){
+        /* Print a sudoku `board` to the console.
         */
         
         // Assure a valid board
