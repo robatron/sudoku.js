@@ -28,13 +28,13 @@ Represents the following board:
 Usage:
 ------
 
-Generate a board:
+**Generate** a board:
 
     >>> var board = sudoku.generate(17)
     
     "...9...2........6......6.........6....5.4.......7...8....4.2378..8.......47.....6"
 
-Solve a board:
+**Solve** a board:
 
     >>> sudoku.solve(board)
     
