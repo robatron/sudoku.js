@@ -48,11 +48,11 @@ Generage a Sudoku puzzle of a particular difficulty, e.g,
 
 Valid difficulties are as follows, and represent the number of given squares:
 
-    "easy":         61
-    "medium":       52
-    "hard":         43
-    "very-hard":    34
-    "insane":       25
+    "easy":         62
+    "medium":       53
+    "hard":         44
+    "very-hard":    35
+    "insane":       26
     "inhuman":      17
     
     
@@ -65,7 +65,7 @@ You may also enter a custom number of squares to give, e.g.,
 
 The number of givens must be a number between 17 and 81 inclusive. If it's 
 outside of that range, the number of givens will be set to the closest bound, 
-e.g., 0 will be treated as 17, and 100 as81.
+e.g., 0 will be treated as 17, and 100 as 81.
 
 
 By default, the puzzles should have unique solutions, unless you set `unique` to
