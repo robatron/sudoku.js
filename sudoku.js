@@ -108,7 +108,7 @@
         for(var i = 0; i < NR_SQUARES; ++i){
             blank_board += '.';
         }
-        var candidates = sudoku.get_candidates(blank_board);
+        var candidates = sudoku._get_candidates_map(blank_board);
         
         // For each item in a shuffled list of squares
         var shuffled_squares = sudoku._shuffle(SQUARES);
@@ -181,7 +181,7 @@
             throw "Too few givens. Minimum givens is " + MIN_GIVENS;
         }
 
-        var candidates = sudoku.get_candidates(board);
+        var candidates = sudoku._get_candidates_map(board);
         var result = sudoku._search(candidates);
         
         if(result){
@@ -195,13 +195,42 @@
     };
 
     sudoku.get_candidates = function(board){
-        /* Get all possible candidates for each square as a map in the form
-        {square: digits} using recursive constraint propagation.
+        /* Return all possible candidatees for each square as a grid of 
+        candidates, returnning `false` if a contradiction is encountered.
         
-        @throws errors if board is not 81 digits, or if those digits aren't 1-9 
-            or '.'
-            
-        @returns `false` if a contradiction is encountered
+        Really just a wrapper for sudoku._get_candidates_map for programmer
+        consumption.
+        */
+        
+        // Assure a valid board
+        var report = sudoku.validate_board(board);
+        if(report !== true){
+            throw report;
+        }
+        
+        // Get a candidates map
+        var candidates_map = sudoku._get_candidates_map(board);
+        
+        // Transform candidates map into grid
+        var rows = [];
+        var cur_row = [];
+        var i = 0;
+        for(var square in candidates_map){
+            var candidates = candidates_map[square];
+            cur_row.push(candidates);
+            if(i % 9 == 8){
+                rows.push(cur_row);
+                cur_row = [];
+            }
+            ++i;
+        }
+        return rows;
+    }
+
+    sudoku._get_candidates_map = function(board){
+        /* Get all possible candidates for each square as a map in the form
+        {square: digits} using recursive constraint propagation. Return `false` 
+        if a contradiction is encountered
         */
         
         // Assure a valid board

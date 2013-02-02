@@ -157,7 +157,7 @@ test("Solve", function(){
     throws(function(){sudoku.solve(puz_invalid_chars)}, "Invalid characters");
 });
 
-test("Get candidates: ", function(){
+test("Get candidates map", function(){
     var puz = 
         "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.."+
         "...1.4......";
@@ -189,17 +189,33 @@ test("Get candidates: ", function(){
         "....3.8..!.9";
     
     // Get candidates for puzzle
-    deepEqual(sudoku.get_candidates(puz), puz_candidates, puz);
+    deepEqual(sudoku._get_candidates_map(puz), puz_candidates, puz);
     
     // Board too big
-    throws(function(){sudoku.get_candidates(puz_too_big)}, 
+    throws(function(){sudoku._get_candidates_map(puz_too_big)}, 
             "Invalid board size");
     
     // Board has invalid character
-    throws(function(){sudoku.get_candidates(puz_invalid_chars)}, 
+    throws(function(){sudoku._get_candidates_map(puz_invalid_chars)}, 
             "Invalid characters");
 });
 
+test("Get candidates", function(){
+    deepEqual(
+        sudoku.get_candidates(
+            "4.25..389....4.265..523.147..1652.7.6..1945322543876915....3.1....4..9.....8....3"
+        ),[
+            ["4","167","2","5","167","16","3","8","9"],
+            ["13789","13789","3789","79","4","189","2","6","5"],
+            ["89","689","5","2","3","689","1","4","7"],
+            ["389","389","1","6","5","2","48","7","48"],
+            ["6","78","78","1","9","4","5","3","2"],
+            ["2","5","4","3","8","7","6","9","1"],
+            ["5","246789","6789","79","267","3","478","1","468"],
+            ["1378","123678","3678","4","1267","156","9","25","68"],
+            ["179","124679","679","8","1267","1569","47","25","3"]
+        ])
+});
 
 // Square relationships
 // ====================
