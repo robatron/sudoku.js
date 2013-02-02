@@ -73,7 +73,7 @@ false, e.g.,
 
 
 Note: **Puzzle uniqueness is not yet implemented**, so puzzles are *not* 
-guaranteed to have unique solutions)
+guaranteed to have unique solutions.
 
 
 Solve a Sudoku puzzle
