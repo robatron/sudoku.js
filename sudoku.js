@@ -23,6 +23,8 @@
     var SQUARE_PEERS_MAP = null;    // Squares -> peers map
 
     var BLANK_CHAR = '.';           // How to represent a blank square
+    var MIN_GIVENS = 17;            // Minimum number of givens 
+    var NR_SQUARES = 81;            // Number of squares
 
     // Init
     // -------------------------------------------------------------------------
@@ -43,11 +45,14 @@
         squares. By default, the puzzles are unique, uless you set `unique` to
         false.
         
+        `nr_givens` must be a number between 17 and 81 inclusive. If it's
+        outside of that range, `nr_givens` will be set to the closest bound.
+        
         (Note: Puzzle uniqueness is not yet implemented.)
         */
         
-        // Force nr_givens between 0 and 81 inclusive
-        nr_givens = nr_givens < 0 ? 0 : (nr_givens > 81 ? 81: nr_givens);
+        // Force nr_givens between 17 and 81 inclusive
+        nr_givens = sudoku._force_range(nr_givens, NR_SQUARES + 1, MIN_GIVENS);
         
         // Default unique to true
         // TODO: Implement uniqueness!
@@ -55,7 +60,7 @@
         
         // Get a set of squares and all possible candidates for each square
         var blank_board = "";
-        for(var i = 0; i < 81; ++i){
+        for(var i = 0; i < NR_SQUARES; ++i){
             blank_board += '.';
         }
         var candidates = sudoku.get_candidates(blank_board);
@@ -84,11 +89,6 @@
                 }
             }
             
-            /*
-            # If we have at least N values, and
-                if len(ds) >= N and len(set(ds)) >= 8:
-                    return ''.join(values[s] if len(values[s])==1 else '.' for s in squares)
-            */
             // If we have at least nr_givens, and the unique candidate count is
             // at least 8, return the puzzle!
             if(single_candidates.length >= nr_givens && 
@@ -115,22 +115,38 @@
     sudoku.solve = function(board){
         /* Solve a sudoku puzzle given a sudoku `board`, i.e., an 81-character 
         string of digits, 1-9, and spaces identified by '.', representing the
-        squares. If the given board has no solutions, return false.
+        squares. There must be a minimum of 17 givens. If the given board has no
+        solutions, return false.
         */
-        if(board){
-            var result = sudoku._search(sudoku.get_candidates(board));
-            if(result){
-                var solution = "";
-                for(var square in result){
-                    solution += result[square];
-                }
-                return solution;
-            }
-            return false;
-            
-        } else {
-            throw "Empty board."
+        
+        // Assure a valid board
+        var report = sudoku.validate_board(board);
+        if(report !== true){
+            throw report;
         }
+        
+        // Check number of givens is at least MIN_GIVENS
+        var nr_givens = 0;
+        for(var i in board){
+            if(board[i] !== BLANK_CHAR && sudoku._in(board[i], DIGITS)){
+                ++nr_givens;
+            }
+        }
+        if(nr_givens < MIN_GIVENS){
+            throw "Too few givens. Minimum givens is " + MIN_GIVENS;
+        }
+        
+        var candidates = sudoku.get_candidates(board);
+        var result = sudoku._search(candidates);
+        
+        if(result){
+            var solution = "";
+            for(var square in result){
+                solution += result[square];
+            }
+            return solution;
+        }
+        return false;
     };
 
     sudoku.get_candidates = function(board){
@@ -143,19 +159,14 @@
         @returns `false` if a contradiction is encountered
         */
         
-        var candidate_map = {}
-        var squares_values_map = sudoku._get_square_vals_map(board);
+        // Assure a valid board
+        var report = sudoku.validate_board(board);
+        if(report !== true){
+            throw report;
+        }
         
-        // Make sure we have a valid board, otherwise throw an error
-        if(board.length !== 81){
-            throw "Invalid board size. Expecting an 81-square board."
-        }
-        for(var v_i in board){
-            var val = board[v_i];
-            if(!sudoku._in(val, DIGITS) && val !== BLANK_CHAR){
-                throw "Invalid board character encountered: " + val;
-            }
-        }
+        var candidate_map = {};
+        var squares_values_map = sudoku._get_square_vals_map(board);
         
         // Start by assigning every digit as a candidate to every square
         for(var si in SQUARES){
@@ -165,10 +176,10 @@
         // For each non-blank square, assign its value in the candidate map and
         // propigate.
         for(var square in squares_values_map){
-            val = squares_values_map[square];
+            var val = squares_values_map[square];
             
             if(sudoku._in(val, DIGITS)){
-                var new_candidates = sudoku._assign(candidate_map, square, val)
+                var new_candidates = sudoku._assign(candidate_map, square, val);
                 
                 // Fail if we can't assign val to square
                 if(!new_candidates){
@@ -178,7 +189,7 @@
         }
         
         return candidate_map;
-    }
+    };
 
     sudoku._search = function(candidates){
         /* Given a map of squares -> candiates, using depth-first search, 
@@ -496,6 +507,34 @@
         console.log(display_string);
     };
 
+    sudoku.validate_board = function(board){
+        /* Return if the given `board` is valid or not. If it's valid, return
+        true. If it's not, return a string of the reason why it's not.
+        */
+        
+        // Check for empty board
+        if(!board){
+            return "Empty board";
+        }
+        
+        // Invalid board length
+        if(board.length !== NR_SQUARES){
+            return "Invalid board size. Board must be exactly " + NR_SQUARES +
+                    " squares.";
+        }
+        
+        // Check for invalid characters
+        for(var i in board){
+            if(!sudoku._in(board[i], DIGITS) && board[i] !== BLANK_CHAR){
+                return "Invalid board character encountered at index " + i + 
+                        ": " + board[i];
+            }
+        }
+        
+        // Otherwise, we're good. Return true.
+        return true;
+    };
+
     sudoku._cross = function(a, b){
         /* Cross product of all elements in `a` and `b`, e.g.,
         sudoku._cross("abc", "123") ->
@@ -514,7 +553,7 @@
         /* Return if a value `v` is in sequence `seq`.
         */
         return seq.indexOf(v) !== -1;
-    }
+    };
     
     sudoku._first_true = function(seq){
         /* Return the first element in `seq` that is true. If no element is
@@ -526,7 +565,7 @@
             }
         }
         return false;
-    }
+    };
 
     sudoku._shuffle = function(seq){
         /* Return a shuffled version of `seq`
@@ -578,6 +617,22 @@
         }
         return seq_set;
     };
+    
+    sudoku._force_range = function(nr, max, min){
+        /* Force `nr` to be within the range from `min` to, but not including, 
+        `max`. `min` is optional, and will default to 0. If `nr` is undefined,
+        treat it as zero.
+        */
+        min = min || 0
+        nr = nr || 0
+        if(nr < min){
+            return min;
+        }
+        if(nr > max){
+            return max;
+        }
+        return nr
+    }
 
     // Initialize library after load
     initialize();

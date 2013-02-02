@@ -197,6 +197,22 @@ test("Get all units", function(){
 // =======
 module("Utility");
 
+test("Validate board", function(){
+   var report_empty             = sudoku.validate_board();
+   var report_invalid_size      = sudoku.validate_board("123");
+   var report_invalid_char      = sudoku.validate_board(
+        ".3.9564272..784136764231589327149658.4.56..73..637._14412893765.8.627"+
+        "341673415892");
+   var report_good              = sudoku.validate_board(
+        ".3.9564272..784136764231589327149658.4.56..73..637..14412893765.8.627"+
+        "341673415892");
+   
+   ok(report_empty !== true);
+   ok(report_invalid_size !== true);
+   ok(report_invalid_char !== true);
+   ok(report_good);
+});
+
 test("Cross product", function(){
 
     // Simple case
