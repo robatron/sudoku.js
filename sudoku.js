@@ -108,7 +108,7 @@
         
         // Give up and try a new puzzle
         return sudoku.generate(nr_givens);
-    }
+    };
 
     // Solve
     // -------------------------------------------------------------------------
@@ -135,7 +135,8 @@
         if(nr_givens < MIN_GIVENS){
             throw "Too few givens. Minimum givens is " + MIN_GIVENS;
         }
-        
+
+loops = 0;
         var candidates = sudoku.get_candidates(board);
         var result = sudoku._search(candidates);
         
@@ -191,6 +192,8 @@
         return candidate_map;
     };
 
+var loops = 0;
+
     sudoku._search = function(candidates){
         /* Given a map of squares -> candiates, using depth-first search, 
         recursively try all possible values until a solution is found, or false
@@ -203,6 +206,9 @@
         if(!candidates){
             return false;
         }
+        
+        loops++;
+        console.log(loops);
         
         // If only one candidate for every square, we've a solved puzzle!
         // Return the candidates map.
@@ -226,9 +232,9 @@
         var min_nr_candidates = 10;
         var min_candidates_square = null;
         for(si in SQUARES){
-            square = SQUARES[si];
+            var square = SQUARES[si];
             
-            nr_candidates = candidates[square].length;
+            var nr_candidates = candidates[square].length;
             
             if(nr_candidates < min_nr_candidates && nr_candidates > 1){
                 min_nr_candidates = nr_candidates;
@@ -237,20 +243,19 @@
         }
         
         // Recursively search for each of the candidates of the square with the
-        // fewest candidates. Return false if
-        var candidates_next = [];
+        // fewest candidates.
         for(var vi in candidates[min_candidates_square]){
             var val = candidates[min_candidates_square][vi];
             
             var candidates_copy = JSON.parse(JSON.stringify(candidates));
-                    
-            candidates_next.push(
-                sudoku._search(
-                    sudoku._assign(candidates_copy, min_candidates_square, val)
-                )
+            var candidates_next = sudoku._search(
+                sudoku._assign(candidates_copy, min_candidates_square, val)
             );
+            
+            if(candidates_next){
+                return candidates_next;
+            }
         }
-        return sudoku._first_true(candidates_next);
     };
 
     sudoku._assign = function(candidates, square, val){
@@ -341,7 +346,7 @@
                 
             // Otherwise the value can only be in one place. Assign it there.
             } else if(val_places.length === 1){
-                candidates_new = 
+                var candidates_new = 
                     sudoku._assign(candidates, val_places[0], val);
                 
                 if(!candidates_new){
@@ -374,7 +379,7 @@
         }
         
         return squares_vals_map;
-    }
+    };
 
     sudoku._get_square_units_map = function(squares, units){
         /* Return a map of `squares` and their associated units (row, col, box)
@@ -403,7 +408,7 @@
         }
 
         return square_unit_map;
-    }
+    };
 
     sudoku._get_square_peers_map = function(squares, units_map){
         /* Return a map of `squares` and their associated peers, i.e., a set of
@@ -438,7 +443,7 @@
         }
 
         return square_peers_map;
-    }
+    };
     
     sudoku._get_all_units = function(rows, cols){
         /* Return a list of all units (rows, cols, boxes)
@@ -465,7 +470,7 @@
         }
 
         return units;
-    }
+    };
     
 
     // Utility
@@ -474,8 +479,8 @@
     sudoku.display_board = function(board){
         /* Display a sudoku `board` to the console.
         */
-        var V_PADDING = " "; // Insert after each square
-        var H_PADDING = '\n' // Insert after each row
+        var V_PADDING = " ";  // Insert after each square
+        var H_PADDING = '\n'; // Insert after each row
         
         var V_BOX_PADDING = "  "; // Box vertical padding
         var H_BOX_PADDING = '\n'; // Box horizontal padding
@@ -533,6 +538,21 @@
         
         // Otherwise, we're good. Return true.
         return true;
+    };
+    
+    sudoku.nr_combos = function(candidates){
+        /* Return the number of possible combinations of candidates you would
+        have to try if you were brute forcing a puzzle given its `candidates`.
+        Used internally for recursion depth checking.
+        */
+        var perms = 1;
+        for(var k in candidates){
+            var nr_candidates = candidates[k].length;
+            if(nr_candidates > 1){
+                perms *= nr_candidates;
+            }
+        }
+        return perms;
     };
 
     sudoku._cross = function(a, b){
