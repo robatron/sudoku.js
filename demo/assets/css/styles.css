@@ -1,0 +1,39 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 100px;
+}
+
+.container-narrow {
+    /* Custom, narrow container */
+    margin: 0 auto;
+    max-width: 600px;
+ }
+
+#sudoku-board {
+    border: 2px solid black;
+}
+
+#sudoku-board td {
+    padding: 0px;
+    margin: 0px;
+}
+
+#sudoku-board input.square {
+    display: block;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom:0px;
+    width: 100%;
+    height: 45px;
+    padding: 0px;
+    font-size: 40px;
+    text-align: center;
+}
+
+#sudoku-board .border-right {
+    border-right: 2px solid black;
+}
+
+#sudoku-board .border-bottom {
+    border-bottom: 2px solid black;
+}
