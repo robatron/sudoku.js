@@ -29,6 +29,9 @@ Represents the following board:
     . . . | . 3 . | . 2 .   
     . . 8 | 7 . . | . . .
 
+(See the included [converstion functions](#board-string-%E2%86%94-grid) to 
+convert between string representations and grids, i.e., two-dimensional arrays.)
+
 
 Generate a Sudoku puzzle
 --------------------------------------------------------------------------------
@@ -131,8 +134,8 @@ Board grid → string:
 Get candidates
 --------------------------------------------------------------------------------
 
-Get the candidates of every square, i.e., the possible values for each square,
-using constraint propatation:
+Get a grid of squares and their candidate values, propagating constraints, i.e.,
+candidates restrict their peer candidates.
 
 ```javascript
 >>> sudoku.get_candidates("4.25..389....4.265..523.147..1652.7.6..1945322543876915....3.1....4..9.....8....3")
