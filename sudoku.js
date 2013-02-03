@@ -3,14 +3,8 @@
     ---------
 
     A Sudoku puzzle generator and solver JavaScript library.
-    
-    Based on ["Solving Every Sudoku Puzzle"][1] by Peter Norvig, and 
-    Michael Anderson's [generator/solver][2].
 
     Please see the README for more details.
-
-    [1]: http://norvig.com/sudoku.html
-    [2]: https://github.com/andermic/cousins/tree/master/sudoku
 */
 
 (function(root){

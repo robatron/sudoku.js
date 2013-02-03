@@ -3,8 +3,8 @@ Sudoku.js
 
 A Sudoku puzzle **generator** and **solver** JavaScript library.
 
-Based on ["Solving Every Sudoku Puzzle"][1] by Peter Norvig, and 
-Michael Anderson's [generator/solver][2].
+Implementation ideas borrowed from ["Solving Every Sudoku Puzzle"][1] by Peter 
+Norvig, and a [generator/solver][2] by Michael Anderson.
 
 
 Intro
