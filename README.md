@@ -29,6 +29,9 @@ Represents the following board:
     . . . | . 3 . | . 2 .   
     . . 8 | 7 . . | . . .
 
+(See the included [converstion functions](#board-string-%E2%86%94-grid) to 
+convert between string representations and grids, i.e., two-dimensional arrays.)
+
 
 Generate a Sudoku puzzle
 --------------------------------------------------------------------------------
