@@ -81,7 +81,6 @@
         guaranteed to have unique solutions)
         
         TODO: Implement puzzle uniqueness
-        TODO: Enforce exact difficulty number, e.g., 17 = 17, not ~17
         */
         
         // If `difficulty` is a string or undefined, convert it to a number or
@@ -130,22 +129,35 @@
             
             // If we have at least difficulty, and the unique candidate count is
             // at least 8, return the puzzle!
-            if(single_candidates.length === difficulty && 
+            if(single_candidates.length >= difficulty && 
                     sudoku._strip_dups(single_candidates).length >= 8){
                 var board = "";
-                for(var si in SQUARES){
-                    var square = SQUARES[si];
+                var givens_idxs = [];
+                for(var i in SQUARES){
+                    var square = SQUARES[i];
                     if(candidates[square].length == 1){
                         board += candidates[square];
+                        givens_idxs.push(i);
                     } else {
                         board += BLANK_CHAR;
                     }
                 }
                 
-                // Make sure board is solvable, and that there is only one
-                // solution
-                var solved = sudoku.solve(board);
-                if(solved){
+                // If we have more than `difficulty` givens, remove some random
+                // givens until we're down to exactly `difficulty`
+                var nr_givens = givens_idxs.length;
+                if(nr_givens > difficulty){
+                    givens_idxs = sudoku._shuffle(givens_idxs);
+                    for(var i = 0; i < nr_givens - difficulty; ++i){
+                        var target = parseInt(givens_idxs[i]);
+                        board = board.substr(0, target) + BLANK_CHAR + 
+                            board.substr(target + 1);
+                    }
+                }
+                
+                // Double check board is solvable
+                // TODO: Make a standalone board checker. Solve is expensive.
+                if(sudoku.solve(board)){
                     return board;
                 }
             }
