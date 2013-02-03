@@ -130,7 +130,7 @@
             
             // If we have at least difficulty, and the unique candidate count is
             // at least 8, return the puzzle!
-            if(single_candidates.length >= difficulty && 
+            if(single_candidates.length === difficulty && 
                     sudoku._strip_dups(single_candidates).length >= 8){
                 var board = "";
                 for(var si in SQUARES){
@@ -141,7 +141,13 @@
                         board += BLANK_CHAR;
                     }
                 }
-                return board;
+                
+                // Make sure board is solvable, and that there is only one
+                // solution
+                var solved = sudoku.solve(board);
+                if(solved){
+                    return board;
+                }
             }
         }
         
@@ -151,11 +157,15 @@
 
     // Solve
     // -------------------------------------------------------------------------
-    sudoku.solve = function(board){
+    sudoku.solve = function(board, reverse){
         /* Solve a sudoku puzzle given a sudoku `board`, i.e., an 81-character 
         string of digits, 1-9, and spaces identified by '.', representing the
         squares. There must be a minimum of 17 givens. If the given board has no
         solutions, return false.
+        
+        Optionally set `reverse` to solve "backwards", i.e., rotate through the
+        possibilities in reverse. Useful for checking if there is more than one
+        solution.
         */
         
         // Assure a valid board
@@ -175,8 +185,11 @@
             throw "Too few givens. Minimum givens is " + MIN_GIVENS;
         }
 
+        // Default reverse to false
+        reverse = reverse || false;
+
         var candidates = sudoku._get_candidates_map(board);
-        var result = sudoku._search(candidates);
+        var result = sudoku._search(candidates, reverse);
         
         if(result){
             var solution = "";
@@ -259,7 +272,7 @@
         return candidate_map;
     };
 
-    sudoku._search = function(candidates){
+    sudoku._search = function(candidates, reverse){
         /* Given a map of squares -> candiates, using depth-first search, 
         recursively try all possible values until a solution is found, or false
         if no solution exists. 
@@ -269,6 +282,9 @@
         if(!candidates){
             return false;
         }
+        
+        // Default reverse to false
+        reverse = reverse || false;
         
         // If only one candidate for every square, we've a solved puzzle!
         // Return the candidates map.
@@ -304,17 +320,39 @@
         
         // Recursively search through each of the candidates of the square 
         // starting with the one with fewest candidates.
-        for(var vi in candidates[min_candidates_square]){
-            var val = candidates[min_candidates_square][vi];
+        
+        // Rotate through the candidates forwards
+        var min_candidates = candidates[min_candidates_square];
+        if(!reverse){
+            for(var vi in min_candidates){
+                var val = min_candidates[vi];
+                
+                // TODO: Implement a non-rediculous deep copy function
+                var candidates_copy = JSON.parse(JSON.stringify(candidates));
+                var candidates_next = sudoku._search(
+                    sudoku._assign(candidates_copy, min_candidates_square, val)
+                );
+                
+                if(candidates_next){
+                    return candidates_next;
+                }
+            }
             
-            // TODO: Implement a non-rediculous deep copy function
-            var candidates_copy = JSON.parse(JSON.stringify(candidates));
-            var candidates_next = sudoku._search(
-                sudoku._assign(candidates_copy, min_candidates_square, val)
-            );
-            
-            if(candidates_next){
-                return candidates_next;
+        // Rotate through the candidates backwards
+        } else {
+            for(var vi = min_candidates.length - 1; vi >= 0; --vi){
+                var val = min_candidates[vi];
+                
+                // TODO: Implement a non-rediculous deep copy function
+                var candidates_copy = JSON.parse(JSON.stringify(candidates));
+                var candidates_next = sudoku._search(
+                    sudoku._assign(candidates_copy, min_candidates_square, val), 
+                    reverse
+                );
+                
+                if(candidates_next){
+                    return candidates_next;
+                }
             }
         }
         
