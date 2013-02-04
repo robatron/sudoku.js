@@ -3,7 +3,7 @@
 
 body {
     padding-top: 60px;
-    padding-bottom: 100px;
+    padding-bottom: 40px;
 }
 
 .container-narrow {
@@ -11,6 +11,10 @@ body {
     margin: 0 auto;
     max-width: 600px;
  }
+
+#footer {
+    margin-top: 120px;    
+}
 
 #sudoku-board {
     border: 2px solid black;

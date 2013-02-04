@@ -1,4 +1,7 @@
-/* JavaScript for the Sudoku.js demo page
+/* 
+    Quick-n-dirty demo page for Sudoku.js.
+
+    For more information, please see https://github.com/robatron/sudoku.js
 */
 
 // Selectors
