@@ -180,10 +180,10 @@ Print a board to the console
 References:
 -----------
 
-- ["Solving Every Sudoku Puzzle"][1] by Peter Norvig
-- Michael Anderson's Python [generator/solver][2] for Mac OS X
+- ["Solving Every Sudoku Puzzle"][norvig-sudoku] by [Peter Norvig][norvig]
+- Sudoku [generator/solver][anderson-sudoku] for Mac OS X by [Michael Anderson][anderson]
 - [95 Sudoku Puzzles][95-sudokus]
-- Andrew Stuart's [online Sudoku Solver][5]
+- Andrew Stuart's [online Sudoku Solver][stuart-sudoku]
 
 
 [norvig-sudoku]: http://norvig.com/sudoku.html
