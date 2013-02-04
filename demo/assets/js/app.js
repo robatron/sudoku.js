@@ -142,6 +142,8 @@ var solve_puzzle = function(puzzle){
     
     // Solve only if it's a valid puzzle
     if(typeof boards[puzzle] !== "undefined"){
+        display_puzzle(boards[puzzle], true);
+        
         var solved_board = sudoku.board_string_to_grid(
             sudoku.solve(
                 sudoku.board_grid_to_string(
@@ -161,6 +163,8 @@ var get_candidates = function(puzzle){
     
     // Get candidates only if it's a valid puzzle
     if(typeof boards[puzzle] !== "undefined"){
+        display_puzzle(boards[puzzle], true);
+        
         var candidates_board = sudoku.get_candidates(
             sudoku.board_grid_to_string(
                 boards[puzzle]
@@ -199,23 +203,25 @@ var show_puzzle = function(difficulty, refresh){
 
 var display_puzzle = function(board, highlight){
     /* Display a Sudoku puzzle on the board, optionally highlighting the new
-    values with green if `highlight` is set.
+    values, with green if `highlight` is set. Additionally do not disable the
+    new value squares.
     */
     for(var r = 0; r < 9; ++r){
         for(var c = 0; c < 9; ++c){
             var $square = $(BOARD_SEL + " input#row" + r + "-col" + c);
             $square.removeClass("green-text");
+            $square.removeAttr("disabled");
             if(board[r][c] != sudoku.BLANK_CHAR){
                 var board_val = board[r][c];
                 var square_val = $square.val();
                 if(highlight && board_val != square_val){
                     $square.addClass("green-text");
+                } else {
+                    $square.attr("disabled", "disabled");
                 }
-                $square.attr("disabled", "disabled");
                 $square.val(board_val);
             } else {
                 $square.val('');
-                $square.removeAttr("disabled");
             }
             // Fire off a change event on the square
             $square.change();
