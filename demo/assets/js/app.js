@@ -4,6 +4,7 @@
 // Selectors
 var BOARD_SEL = "#sudoku-board";
 var TABS_SEL = "#generator-tabs";
+var MESSAGE_SEL = "#message";
 var PUZZLE_CONTROLS_SEL = "#puzzle-controls";
 var IMPORT_CONTROLS_SEL = "#import-controls";
 var SOLVER_CONTROLS_SEL = "#solver-controls";
@@ -92,6 +93,9 @@ var init_tabs = function(){
         var $t = $(this);
         var t_name = $t.attr("id");
         
+        // Hide any error messages
+        $(MESSAGE_SEL).hide();
+        
         // If it's the import tab
         if(t_name === "import"){
             $(PUZZLE_CONTROLS_SEL).hide();
@@ -151,22 +155,24 @@ var init_controls = function(){
         /* Solve the current puzzle
         */
         e.preventDefault();
-        var tab_name = get_tab();
-        if(tab_name !== "import"){
-            solve_puzzle(tab_name);
-        }
+        solve_puzzle(get_tab());
     });
     
     $(SOLVER_CONTROLS_SEL + " #get-candidates").click(function(e){
         /* Get candidates for the current puzzle
         */
         e.preventDefault();
-        var tab_name = get_tab();
-        if(tab_name !== "import"){
-            get_candidates(tab_name);
-        }
+        get_candidates(get_tab());
     });
 };
+
+var init_message = function(){
+    /* Initialize the message bar
+    */
+    
+    //Hide initially
+    $(MESSAGE_SEL).hide();
+}
 
 var solve_puzzle = function(puzzle){
     /* Solve the specified puzzle and show it
@@ -176,16 +182,25 @@ var solve_puzzle = function(puzzle){
     if(typeof boards[puzzle] !== "undefined"){
         display_puzzle(boards[puzzle], true);
         
-        var solved_board = sudoku.board_string_to_grid(
-            sudoku.solve(
-                sudoku.board_grid_to_string(
-                    boards[puzzle]
-                )
-            )
-        );
-            
-        // Display the solved puzzle, highlighting the added values
-        display_puzzle(solved_board, true);
+        var error = false;
+        try{
+            var solved_board = 
+                sudoku.solve(sudoku.board_grid_to_string(boards[puzzle]));
+        } catch(e) {
+            error = true;
+        }
+        
+        // Display the solved puzzle if solved successfully, display error if
+        // unable to solve.
+        if(solved_board && !error){
+            display_puzzle(sudoku.board_string_to_grid(solved_board), true);
+            $(MESSAGE_SEL).hide();
+        } else {
+            $(MESSAGE_SEL + " #text")
+                .html("<strong>Unable to solve!</strong> "
+                    + "Check puzzle and try again.");
+            $(MESSAGE_SEL).show();
+        }
     }
 };
 
@@ -197,14 +212,27 @@ var get_candidates = function(puzzle){
     if(typeof boards[puzzle] !== "undefined"){
         display_puzzle(boards[puzzle], true);
         
-        var candidates_board = sudoku.get_candidates(
-            sudoku.board_grid_to_string(
-                boards[puzzle]
-            )
-        );
-            
-        // Display the solved puzzle, highlighting the added values
-        display_puzzle(candidates_board, true);
+        var error = false;
+        try{
+            var candidates = 
+                sudoku.get_candidates(
+                    sudoku.board_grid_to_string(boards[puzzle])
+                );
+        } catch(e) {
+            error = true;
+        }
+        
+        // Display the candidates if solved successfully, display error if
+        // unable to solve.
+        if(candidates && !error){
+            display_puzzle(candidates, true);
+            $(MESSAGE_SEL).hide();
+        } else {
+            $(MESSAGE_SEL + " #text")
+                .html("<strong>Unable to display candidates!</strong> " +
+                    "Contradictions encountered. Check puzzle and try again.");
+            $(MESSAGE_SEL).show();
+        }
     }
 }
 
@@ -283,6 +311,7 @@ $(function(){
     init_board();
     init_tabs();
     init_controls();
+    init_message();
     
     // Start with generating an easy puzzle
     click_tab("easy");

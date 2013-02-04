@@ -234,6 +234,11 @@
         // Get a candidates map
         var candidates_map = sudoku._get_candidates_map(board);
         
+        // If there's an error, return false
+        if(!candidates_map){
+            return false;
+        }
+        
         // Transform candidates map into grid
         var rows = [];
         var cur_row = [];
