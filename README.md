@@ -3,9 +3,14 @@ Sudoku.js
 
 A Sudoku puzzle **generator** and **solver** JavaScript library.
 
-Implementation ideas borrowed from ["Solving Every Sudoku Puzzle"][1] by Peter 
-Norvig, and a [generator/solver][2] by Michael Anderson.
+Checkout the [online demo][demo] to see it in action.
 
+Implementation ideas borrowed from
+["Solving Every Sudoku Puzzle"][norvig-sudoku] by 
+[Peter Norvig][norvig], and a [generator/solver][anderson-sudoku] by 
+[Michael Anderson][anderson].
+
+[demo]:http://htmlpreview.github.com/?https://github.com/robatron/sudoku.js/blob/master/demo/index.html
 
 Intro
 --------------------------------------------------------------------------------
@@ -177,13 +182,13 @@ References:
 
 - ["Solving Every Sudoku Puzzle"][1] by Peter Norvig
 - Michael Anderson's Python [generator/solver][2] for Mac OS X
-- ["Sudoku"][3] on Wikipedia
-- [95 Sudoku Puzzles][4]
+- [95 Sudoku Puzzles][95-sudokus]
 - Andrew Stuart's [online Sudoku Solver][5]
 
 
-[1]: http://norvig.com/sudoku.html
-[2]: https://github.com/andermic/cousins/tree/master/sudoku
-[3]: http://en.wikipedia.org/wiki/Sudoku
-[4]: http://magictour.free.fr/top95
-[5]: http://www.sudokuwiki.org/sudoku.htm
+[norvig-sudoku]: http://norvig.com/sudoku.html
+[anderson-sudoku]: https://github.com/andermic/cousins/tree/master/sudoku
+[stuart-sudoku]: http://www.sudokuwiki.org/sudoku.htm
+[95-sudokus]: http://magictour.free.fr/top95
+[norvig]: http://norvig.com
+[anderson]: https//github.com/andermic/
