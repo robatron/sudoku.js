@@ -18,8 +18,7 @@
     var UNITS = null;               // All units (row, column, or box)
     var SQUARE_UNITS_MAP = null;    // Squares -> units map
     var SQUARE_PEERS_MAP = null;    // Squares -> peers map
-
-    var BLANK_CHAR = '.';           // How to represent a blank square
+    
     var MIN_GIVENS = 17;            // Minimum number of givens 
     var NR_SQUARES = 81;            // Number of squares
     
@@ -33,6 +32,9 @@
         "insane":       26,
         "inhuman":      17,
     };
+
+    // Blank character representation
+    sudoku.BLANK_CHAR = '.';
 
     // Init
     // -------------------------------------------------------------------------
@@ -139,7 +141,7 @@
                         board += candidates[square];
                         givens_idxs.push(i);
                     } else {
-                        board += BLANK_CHAR;
+                        board += sudoku.BLANK_CHAR;
                     }
                 }
                 
@@ -150,7 +152,7 @@
                     givens_idxs = sudoku._shuffle(givens_idxs);
                     for(var i = 0; i < nr_givens - difficulty; ++i){
                         var target = parseInt(givens_idxs[i]);
-                        board = board.substr(0, target) + BLANK_CHAR + 
+                        board = board.substr(0, target) + sudoku.BLANK_CHAR + 
                             board.substr(target + 1);
                     }
                 }
@@ -189,7 +191,7 @@
         // Check number of givens is at least MIN_GIVENS
         var nr_givens = 0;
         for(var i in board){
-            if(board[i] !== BLANK_CHAR && sudoku._in(board[i], DIGITS)){
+            if(board[i] !== sudoku.BLANK_CHAR && sudoku._in(board[i], DIGITS)){
                 ++nr_givens;
             }
         }
@@ -682,7 +684,7 @@
         
         // Check for invalid characters
         for(var i in board){
-            if(!sudoku._in(board[i], DIGITS) && board[i] !== BLANK_CHAR){
+            if(!sudoku._in(board[i], DIGITS) && board[i] !== sudoku.BLANK_CHAR){
                 return "Invalid board character encountered at index " + i + 
                         ": " + board[i];
             }
