@@ -5,6 +5,7 @@
 var BOARD_SEL = "#sudoku-board";
 var TABS_SEL = "#generator-tabs";
 var PUZZLE_CONTROLS_SEL = "#puzzle-controls";
+var IMPORT_CONTROLS_SEL = "#import-controls";
 var SOLVER_CONTROLS_SEL = "#solver-controls";
 
 // Boards
@@ -16,6 +17,7 @@ var boards = {
     "very-hard": null,
     "insane": null,
     "inhuman": null,
+    "import": null,
 };
 
 var build_board = function(){
@@ -92,12 +94,15 @@ var init_tabs = function(){
         
         // If it's the import tab
         if(t_name === "import"){
+            $(PUZZLE_CONTROLS_SEL).hide();
+            $(IMPORT_CONTROLS_SEL).show();
         
         // Otherwise it's a normal difficulty tab
         } else {
-            show_puzzle(t_name);
+            $(PUZZLE_CONTROLS_SEL).show();
+            $(IMPORT_CONTROLS_SEL).hide();
         }
-        
+        show_puzzle(t_name);
         $t.tab('show');
     });
 };
@@ -105,6 +110,8 @@ var init_tabs = function(){
 var init_controls = function(){
     /* Initialize the controls
     */
+    
+    // Puzzle controls
     $(PUZZLE_CONTROLS_SEL + " #refresh").click(function(e){
         /* Refresh the current puzzle
         */
@@ -115,6 +122,31 @@ var init_controls = function(){
         }
     });
     
+    // Import controls
+    $(IMPORT_CONTROLS_SEL + " #import-string").change(function(){
+        /* Update the board to reflect the import string
+        */
+        var import_val = $(this).val();
+        var processed_board = "";
+        for(var i = 0; i < 81; ++i){
+            if(typeof import_val[i] !== "undefined" &&
+                    (sudoku._in(import_val[i], sudoku.DIGITS) || 
+                    import_val[i] === sudoku.BLANK_CHAR)){
+                processed_board += import_val[i];
+            } else {
+                processed_board += sudoku.BLANK_CHAR;
+            }
+        }
+        boards["import"] = sudoku.board_string_to_grid(processed_board);
+        show_puzzle("import");
+    });
+    $(IMPORT_CONTROLS_SEL + " #import-string").keyup(function(){
+        /* Fire a change event on keyup, enforce digits
+        */
+        $(this).change();
+    });
+    
+    // Solver controls
     $(SOLVER_CONTROLS_SEL + " #solve").click(function(e){
         /* Solve the current puzzle
         */
@@ -176,8 +208,8 @@ var get_candidates = function(puzzle){
     }
 }
 
-var show_puzzle = function(difficulty, refresh){
-    /* Show the puzzle of the specified difficulty. If the board has not been
+var show_puzzle = function(puzzle, refresh){
+    /* Show the puzzle of the specified puzzle. If the board has not been
     generated yet, generate a new one and save. Optionally, set `refresh` to 
     force a refresh of the specified puzzle.
     */
@@ -185,20 +217,24 @@ var show_puzzle = function(difficulty, refresh){
     // default refresh to false
     refresh = refresh || false;
     
-    // If not a valid difficulty, default -> "easy"
-    if(typeof boards[difficulty] === "undefined"){
-        difficulty = "easy";
+    // If not a valid puzzle, default -> "easy"
+    if(typeof boards[puzzle] === "undefined"){
+        puzzle = "easy";
     }
     
-    // If the board at the specified difficulty doesn't exist yet, or `refresh`
+    // If the board at the specified puzzle doesn't exist yet, or `refresh`
     // is set, generate a new one
-    if(boards[difficulty] === null || refresh){
-        boards[difficulty] = 
-            sudoku.board_string_to_grid(sudoku.generate(difficulty));
+    if(boards[puzzle] === null || refresh){
+        if(puzzle === "import"){
+            boards[puzzle] = sudoku.board_string_to_grid(sudoku.BLANK_BOARD);
+        } else {
+            boards[puzzle] = 
+                sudoku.board_string_to_grid(sudoku.generate(puzzle));
+        }
     }
     
     // Display the puzzle
-    display_puzzle(boards[difficulty]);
+    display_puzzle(boards[puzzle]);
 }
 
 var display_puzzle = function(board, highlight){

@@ -10,9 +10,9 @@
 (function(root){
     var sudoku = root.sudoku = {};  // Global reference to the sudoku library
 
-    var DIGITS = "123456789";       // Allowed digits
+    sudoku.DIGITS = "123456789";    // Allowed sudoku.DIGITS
     var ROWS = "ABCDEFGHI";         // Row lables
-    var COLS = DIGITS;              // Column lables
+    var COLS = sudoku.DIGITS;       // Column lables
     var SQUARES = null;             // Square IDs
 
     var UNITS = null;               // All units (row, column, or box)
@@ -33,8 +33,10 @@
         "inhuman":      17,
     };
 
-    // Blank character representation
+    // Blank character and board representation
     sudoku.BLANK_CHAR = '.';
+    sudoku.BLANK_BOARD = "...................................................."+
+            ".............................";
 
     // Init
     // -------------------------------------------------------------------------
@@ -173,7 +175,7 @@
     // -------------------------------------------------------------------------
     sudoku.solve = function(board, reverse){
         /* Solve a sudoku puzzle given a sudoku `board`, i.e., an 81-character 
-        string of digits, 1-9, and spaces identified by '.', representing the
+        string of sudoku.DIGITS, 1-9, and spaces identified by '.', representing the
         squares. There must be a minimum of 17 givens. If the given board has no
         solutions, return false.
         
@@ -191,7 +193,7 @@
         // Check number of givens is at least MIN_GIVENS
         var nr_givens = 0;
         for(var i in board){
-            if(board[i] !== sudoku.BLANK_CHAR && sudoku._in(board[i], DIGITS)){
+            if(board[i] !== sudoku.BLANK_CHAR && sudoku._in(board[i], sudoku.DIGITS)){
                 ++nr_givens;
             }
         }
@@ -250,7 +252,7 @@
 
     sudoku._get_candidates_map = function(board){
         /* Get all possible candidates for each square as a map in the form
-        {square: digits} using recursive constraint propagation. Return `false` 
+        {square: sudoku.DIGITS} using recursive constraint propagation. Return `false` 
         if a contradiction is encountered
         */
         
@@ -265,7 +267,7 @@
         
         // Start by assigning every digit as a candidate to every square
         for(var si in SQUARES){
-            candidate_map[SQUARES[si]] = DIGITS;
+            candidate_map[SQUARES[si]] = sudoku.DIGITS;
         }
         
         // For each non-blank square, assign its value in the candidate map and
@@ -273,7 +275,7 @@
         for(var square in squares_values_map){
             var val = squares_values_map[square];
             
-            if(sudoku._in(val, DIGITS)){
+            if(sudoku._in(val, sudoku.DIGITS)){
                 var new_candidates = sudoku._assign(candidate_map, square, val);
                 
                 // Fail if we can't assign val to square
@@ -684,7 +686,7 @@
         
         // Check for invalid characters
         for(var i in board){
-            if(!sudoku._in(board[i], DIGITS) && board[i] !== sudoku.BLANK_CHAR){
+            if(!sudoku._in(board[i], sudoku.DIGITS) && board[i] !== sudoku.BLANK_CHAR){
                 return "Invalid board character encountered at index " + i + 
                         ": " + board[i];
             }
