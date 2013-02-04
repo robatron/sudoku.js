@@ -8,6 +8,7 @@ var PUZZLE_CONTROLS_SEL = "#puzzle-controls";
 var SOLVER_CONTROLS_SEL = "#solver-controls";
 
 // Boards
+// TODO: Cache puzzles as strings instead of grids to cut down on conversions?
 var boards = {
     "easy": null,
     "medium": null,
@@ -18,7 +19,9 @@ var boards = {
 };
 
 var build_board = function(){
-    /* Build the Sudoku board
+    /* Build the Sudoku board markup
+    
+    TODO: Hardcode the result
     */
     for(var r = 0; r < 9; ++r){
         var $row = $("<tr/>", {});
@@ -77,10 +80,22 @@ var init_controls = function(){
     });
     
     $(SOLVER_CONTROLS_SEL + " #solve").click(function(e){
+        /* Solve the current puzzle
+        */
         e.preventDefault();
         var tab_name = get_tab();
         if(tab_name !== "import"){
             solve_puzzle(tab_name);
+        }
+    });
+    
+    $(SOLVER_CONTROLS_SEL + " #get-candidates").click(function(e){
+        /* Get candidates for the current puzzle
+        */
+        e.preventDefault();
+        var tab_name = get_tab();
+        if(tab_name !== "import"){
+            get_candidates(tab_name);
         }
     });
 };
@@ -91,7 +106,7 @@ var solve_puzzle = function(puzzle){
     
     // Solve only if it's a valid puzzle
     if(typeof boards[puzzle] !== "undefined"){
-        boards[puzzle] = sudoku.board_string_to_grid(
+        var solved_board = sudoku.board_string_to_grid(
             sudoku.solve(
                 sudoku.board_grid_to_string(
                     boards[puzzle]
@@ -100,9 +115,26 @@ var solve_puzzle = function(puzzle){
         );
             
         // Display the solved puzzle, highlighting the added values
-        display_puzzle(boards[puzzle], true);
+        display_puzzle(solved_board, true);
     }
 };
+
+var get_candidates = function(puzzle){
+    /* Get the candidates for the specified puzzle and show it
+    */
+    
+    // Get candidates only if it's a valid puzzle
+    if(typeof boards[puzzle] !== "undefined"){
+        var candidates_board = sudoku.get_candidates(
+            sudoku.board_grid_to_string(
+                boards[puzzle]
+            )
+        );
+            
+        // Display the solved puzzle, highlighting the added values
+        display_puzzle(candidates_board, true);
+    }
+}
 
 var show_puzzle = function(difficulty, refresh){
     /* Show the puzzle of the specified difficulty. If the board has not been
