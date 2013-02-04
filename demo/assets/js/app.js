@@ -4,6 +4,7 @@
 // Selectors
 var BOARD_SEL = "#sudoku-board";
 var TABS_SEL = "#generator-tabs";
+var CONTROLS_SEL = "#puzzle-controls";
 
 // Boards
 var boards = {
@@ -61,6 +62,21 @@ var init_tabs = function(){
     });
 };
 
+var init_controls = function(){
+    /* Initialize the puzzle controls
+    */
+    $(CONTROLS_SEL + " #refresh").click(function(e){
+        /* Refresh the current puzzle
+        */
+        e.preventDefault();
+        var $selected_tab = $(TABS_SEL + " li.active a");
+        var tab_name = $selected_tab.attr("id");
+        if(tab_name !== "import"){
+            show_puzzle(tab_name, true);
+        }
+    });
+};
+
 var show_puzzle = function(difficulty, refresh){
     /* Show the puzzle of the specified difficulty. If the board has not been
     generated yet, generate a new one and save. Optionally, set `refresh` to 
@@ -107,4 +123,8 @@ var display_puzzle = function(board){
 $(function(){
     build_board();
     init_tabs();
+    init_controls();
+    
+    // Start with generating an easy puzzle
+    $(TABS_SEL + " #easy").click();
 });
