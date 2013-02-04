@@ -191,4 +191,4 @@ References:
 [stuart-sudoku]: http://www.sudokuwiki.org/sudoku.htm
 [95-sudokus]: http://magictour.free.fr/top95
 [norvig]: http://norvig.com
-[anderson]: https//github.com/andermic/
+[anderson]: https://github.com/andermic/
