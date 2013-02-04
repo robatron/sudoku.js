@@ -37,3 +37,7 @@ body {
 #sudoku-board .border-bottom {
     border-bottom: 2px solid black;
 }
+
+.green-text {
+    color: ForestGreen !important;
+}

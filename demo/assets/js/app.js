@@ -4,16 +4,17 @@
 // Selectors
 var BOARD_SEL = "#sudoku-board";
 var TABS_SEL = "#generator-tabs";
-var CONTROLS_SEL = "#puzzle-controls";
+var PUZZLE_CONTROLS_SEL = "#puzzle-controls";
+var SOLVER_CONTROLS_SEL = "#solver-controls";
 
 // Boards
 var boards = {
-    easy: null,
-    medium: null,
-    hard: null,
-    very_hard: null,
-    insane: null,
-    inhuman: null,
+    "easy": null,
+    "medium": null,
+    "hard": null,
+    "very-hard": null,
+    "insane": null,
+    "inhuman": null,
 };
 
 var build_board = function(){
@@ -63,18 +64,44 @@ var init_tabs = function(){
 };
 
 var init_controls = function(){
-    /* Initialize the puzzle controls
+    /* Initialize the controls
     */
-    $(CONTROLS_SEL + " #refresh").click(function(e){
+    $(PUZZLE_CONTROLS_SEL + " #refresh").click(function(e){
         /* Refresh the current puzzle
         */
         e.preventDefault();
-        var $selected_tab = $(TABS_SEL + " li.active a");
-        var tab_name = $selected_tab.attr("id");
+        var tab_name = get_tab();
         if(tab_name !== "import"){
             show_puzzle(tab_name, true);
         }
     });
+    
+    $(SOLVER_CONTROLS_SEL + " #solve").click(function(e){
+        e.preventDefault();
+        var tab_name = get_tab();
+        if(tab_name !== "import"){
+            solve_puzzle(tab_name);
+        }
+    });
+};
+
+var solve_puzzle = function(puzzle){
+    /* Solve the specified puzzle and show it
+    */
+    
+    // Solve only if it's a valid puzzle
+    if(typeof boards[puzzle] !== "undefined"){
+        boards[puzzle] = sudoku.board_string_to_grid(
+            sudoku.solve(
+                sudoku.board_grid_to_string(
+                    boards[puzzle]
+                )
+            )
+        );
+            
+        // Display the solved puzzle, highlighting the added values
+        display_puzzle(boards[puzzle], true);
+    }
 };
 
 var show_puzzle = function(difficulty, refresh){
@@ -84,7 +111,7 @@ var show_puzzle = function(difficulty, refresh){
     */
     
     // default refresh to false
-    refresh = refresh || false
+    refresh = refresh || false;
     
     // If not a valid difficulty, default -> "easy"
     if(typeof boards[difficulty] === "undefined"){
@@ -102,21 +129,40 @@ var show_puzzle = function(difficulty, refresh){
     display_puzzle(boards[difficulty]);
 }
 
-var display_puzzle = function(board){
-    /* Display a Sudoku puzzle on the board
+var display_puzzle = function(board, highlight){
+    /* Display a Sudoku puzzle on the board, optionally highlighting the new
+    values with green if `highlight` is set.
     */
     for(var r = 0; r < 9; ++r){
         for(var c = 0; c < 9; ++c){
             var $square = $(BOARD_SEL + " input#row" + r + "-col" + c);
+            $square.removeClass("green-text");
             if(board[r][c] != sudoku.BLANK_CHAR){
-                $square.val(board[r][c]);
+                var board_val = board[r][c];
+                var square_val = $square.val();
+                if(highlight && board_val != square_val){
+                    $square.addClass("green-text");
+                }
                 $square.attr("disabled", "disabled");
+                $square.val(board_val);
             } else {
                 $square.val('');
                 $square.removeAttr("disabled");
             }
         }
     }
+};
+
+var get_tab = function(){
+    /* Return the name of the currently-selected tab
+    */
+    return $(TABS_SEL + " li.active a").attr("id");
+};
+
+var click_tab = function(tab_name){
+    /* Click the specified tab by name
+    */
+    $(TABS_SEL + " #" + tab_name).click();
 };
 
 // "Main" (document ready)
@@ -126,5 +172,5 @@ $(function(){
     init_controls();
     
     // Start with generating an easy puzzle
-    $(TABS_SEL + " #easy").click();
+    click_tab("easy");
 });
