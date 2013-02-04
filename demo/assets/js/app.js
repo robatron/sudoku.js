@@ -34,7 +34,8 @@ var build_board = function(){
                 $("<input/>", {
                     id: "row" + r + "-col" + c,
                     class: "square",
-                    type: "text",
+                    maxlength: "9",
+                    type: "text"
                 })
             );
             $row.append($square);
@@ -44,6 +45,41 @@ var build_board = function(){
         }
         $(BOARD_SEL).append($row);
     }
+};
+
+var init_board = function(){
+    /* Initialize board interactions
+    */
+    $(BOARD_SEL + " input.square").change(function(){
+        /* Resize font size in each square depending on how many characters are
+        in it.
+        */
+        var $square = $(this);
+        var nr_digits = $square.val().length;
+        var font_size = "40px";
+        if(nr_digits === 3){
+            font_size = "35px";
+        } else if(nr_digits === 4){
+            font_size = "25px";
+        } else if(nr_digits === 5){
+            font_size = "20px";
+        } else if(nr_digits === 6){
+            font_size = "17px";
+        } else if(nr_digits === 7){
+            font_size = "14px";
+        } else if(nr_digits === 8){
+            font_size = "13px";
+        } else if(nr_digits >= 9){
+            font_size = "11px";
+        }
+        $(this).css("font-size", font_size);
+    });
+    $(BOARD_SEL + " input.square").keyup(function(){
+        /* Fire a change event on keyup, enforce digits
+        */
+        $(this).change();
+    });
+
 };
 
 var init_tabs = function(){
@@ -181,6 +217,8 @@ var display_puzzle = function(board, highlight){
                 $square.val('');
                 $square.removeAttr("disabled");
             }
+            // Fire off a change event on the square
+            $square.change();
         }
     }
 };
@@ -200,6 +238,7 @@ var click_tab = function(tab_name){
 // "Main" (document ready)
 $(function(){
     build_board();
+    init_board();
     init_tabs();
     init_controls();
     
