@@ -40,35 +40,70 @@
             <!-- Masthead -->
             <h1>Sudoku.js Demo</h1>
             <p class="lead">
-                A hacked-together demonstration of
+                A quick-n-dirty demonstration of
                 <a href="https://github.com/robatron/sudoku-js">
                     Sudoku.js</a>.
             </p>
+            <p>
+                This demonstrates the following features of the Sudoku.js 
+                library:
+            </p>
+            <ul>
+                <li>
+                    <a href="https://github.com/robatron/sudoku.js#generate-a-sudoku-puzzle">
+                    Generating</a> a Sudoku
+                </li>
+                <li>
+                    <a href="https://github.com/robatron/sudoku.js#solve-a-sudoku-puzzle">
+                    Solving</a> a Sudoku
+                </li>
+                <li>
+                    Finding the
+                    <a href="https://github.com/robatron/sudoku.js#get-candidates">
+                    candidates</a> for each square of a Sudoku
+                </li>
+            </ul>
             
+            <br>
             <br>
             
             <!-- Tabs -->
             <ul id="generator-tabs" class="nav nav-tabs">
                 <li>
-                    <a id="easy" href="#">Easy</a>
+                    <a id="easy" rel="tooltip" title="Generate an easy puzzle" 
+                            href="#">Easy</a>
                 </li>
                 <li>
-                    <a id="medium" href="#">Medium</a>
+                    <a id="medium" rel="tooltip" 
+                            title="Generate a medium puzzle" href="#">Medium</a>
                 </li>
                 <li>
-                    <a id="hard" href="#">Hard</a>
+                    <a id="hard" rel="tooltip" title="Generate a hard puzzle" 
+                            href="#">Hard</a>
                 </li>
                 <li>
-                    <a id="very-hard" href="#">Very hard</a>
+                    <a id="very-hard" rel="tooltip" 
+                            title="Generate a very hard puzzle" href="#">
+                        Very hard    
+                    </a>
                 </li>
                 <li>
-                    <a id="insane" href="#">Insane</a>
+                    <a id="insane" rel="tooltip" 
+                            title="Generate an insane puzzle" href="#">
+                        Insane
+                    </a>
                 </li>
                 <li>
-                    <a id="inhuman" href="#">Inhuman</a>
+                    <a id="inhuman" rel="tooltip" 
+                            title="Generate an inhuman puzzle" href="#">
+                        Robots only
+                    </a>
                 </li>
                 <li class="pull-right">
-                    <a id="import" href="#">Import...</a>
+                    <a id="import" rel="tooltip" title="Import your own puzzle" 
+                            href="#">
+                        Import...
+                    </a>
                 </li>
             </ul>
             
@@ -80,7 +115,8 @@
             </div>
             
             <div id="puzzle-controls">
-                <a id="refresh" class="pull-right" href="#">
+                <a id="refresh" class="pull-right" rel="tooltip" 
+                        title="Refresh the current puzzle" href="#">
                     Refresh  
                 </a>
             </div>
@@ -100,10 +136,14 @@
             
             <!-- Solver buttons -->
             <div id="solver-controls">
-                <button id="solve" class="btn btn-primary">
+                <button id="solve" class="btn btn-primary" rel="tooltip" 
+                        title="Solve the current puzzle!" 
+                        data-placement="bottom">
                     Solve!
                 </button>
-                <button id="get-candidates" class="btn pull-right">
+                <button id="get-candidates" class="btn pull-right" rel="tooltip" 
+                        title="Show all possible values for each empty square" 
+                        data-placement="bottom">
                     Show Candidates
                 </button>
             </div>

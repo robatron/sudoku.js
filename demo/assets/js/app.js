@@ -274,14 +274,12 @@ var display_puzzle = function(board, highlight){
         for(var c = 0; c < 9; ++c){
             var $square = $(BOARD_SEL + " input#row" + r + "-col" + c);
             $square.removeClass("green-text");
-            $square.removeAttr("disabled");
+            $square.attr("disabled", "disabled");
             if(board[r][c] != sudoku.BLANK_CHAR){
                 var board_val = board[r][c];
                 var square_val = $square.val();
                 if(highlight && board_val != square_val){
                     $square.addClass("green-text");
-                } else {
-                    $square.attr("disabled", "disabled");
                 }
                 $square.val(board_val);
             } else {
@@ -312,6 +310,9 @@ $(function(){
     init_tabs();
     init_controls();
     init_message();
+    
+    // Initialize tooltips
+    $("[rel='tooltip']").tooltip();
     
     // Start with generating an easy puzzle
     click_tab("easy");
