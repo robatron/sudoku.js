@@ -10,7 +10,7 @@ Implementation ideas borrowed from
 [Peter Norvig][norvig], and a [generator/solver][anderson-sudoku] by 
 [Michael Anderson][anderson].
 
-[demo]:http://htmlpreview.github.com/?https://github.com/robatron/sudoku.js/blob/master/demo/index.html
+[demo]:http://htmlpreview.github.io/?https://github.com/robatron/sudoku.js/blob/master/demo/index.html
 
 Intro
 --------------------------------------------------------------------------------
