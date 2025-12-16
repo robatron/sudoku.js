@@ -80,9 +80,7 @@
         e.g., 0 -> 17, and 100 -> 81.
         
         
-        By default, the puzzles are unique, unless you set `unique` to false. 
-        (Note: Puzzle uniqueness is not yet implemented, so puzzles are *not* 
-        guaranteed to have unique solutions)
+        By default, the puzzles are unique, unless you set `unique` to false.
         */
         
         // If `difficulty` is a string or undefined, convert it to a number or
