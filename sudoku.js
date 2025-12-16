@@ -167,7 +167,7 @@
                     // Check if "backwards" solution is equal to regular solution.
                     // If it is, the sudoku has a unique solution.
                     const reverseSolution = sudoku.solve(board, true);
-                    if(reverseSolution == solution){
+                    if(reverseSolution === solution){
                         return board;
                     }
                 }
