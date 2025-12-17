@@ -80,11 +80,7 @@
         e.g., 0 -> 17, and 100 -> 81.
         
         
-        By default, the puzzles are unique, uless you set `unique` to false. 
-        (Note: Puzzle uniqueness is not yet implemented, so puzzles are *not* 
-        guaranteed to have unique solutions)
-        
-        TODO: Implement puzzle uniqueness
+        By default, the puzzles are unique, unless you set `unique` to false.
         */
         
         // If `difficulty` is a string or undefined, convert it to a number or
@@ -98,7 +94,9 @@
                 MIN_GIVENS);
         
         // Default unique to true
-        unique = unique || true;
+        if(typeof unique === "undefined"){
+            unique = true;
+        }
         
         // Get a set of squares and all possible candidates for each square
         var blank_board = "";
@@ -161,8 +159,17 @@
                 
                 // Double check board is solvable
                 // TODO: Make a standalone board checker. Solve is expensive.
-                if(sudoku.solve(board)){
-                    return board;
+                const solution = sudoku.solve(board);
+                if(solution){
+                    if(!unique){
+                        return board;
+                    }
+                    // Check if "backwards" solution is equal to regular solution.
+                    // If it is, the sudoku has a unique solution.
+                    const reverseSolution = sudoku.solve(board, true);
+                    if(reverseSolution === solution){
+                        return board;
+                    }
                 }
             }
         }
